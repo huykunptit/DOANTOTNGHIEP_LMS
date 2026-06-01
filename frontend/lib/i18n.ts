@@ -1,0 +1,56 @@
+import type { Language } from "@/stores/language";
+
+const dictionary = {
+  vi: {
+    appName: "ERIPT LMS",
+    homeTitle: "Hệ thống học tập cho trường đại học",
+    homeSubtitle: "Thiết kế rõ ràng, dễ nhìn, phù hợp cho mọi lứa tuổi.",
+    login: "Đăng nhập",
+    register: "Đăng ký",
+    dashboard: "Bảng điều khiển",
+    language: "Ngôn ngữ",
+    english: "English",
+    vietnamese: "Tiếng Việt",
+    signIn: "Đăng nhập",
+    welcomeBack: "Chào mừng quay lại",
+    email: "Email",
+    password: "Mật khẩu",
+    forgotPassword: "Quên mật khẩu?",
+    rememberMe: "Ghi nhớ đăng nhập",
+    loginWithGoogle: "Đăng nhập với Google",
+    createAccount: "Tạo tài khoản",
+    fullName: "Họ và tên",
+    role: "Vai trò",
+    student: "Sinh viên",
+    instructor: "Giảng viên",
+    admin: "Quản trị viên",
+  },
+  en: {
+    appName: "ERIPT LMS",
+    homeTitle: "Learning system for universities",
+    homeSubtitle: "Clear, easy to read, and suitable for all ages.",
+    login: "Login",
+    register: "Register",
+    dashboard: "Dashboard",
+    language: "Language",
+    english: "English",
+    vietnamese: "Vietnamese",
+    signIn: "Sign in",
+    welcomeBack: "Welcome back",
+    email: "Email",
+    password: "Password",
+    forgotPassword: "Forgot password?",
+    rememberMe: "Remember me",
+    loginWithGoogle: "Login with Google",
+    createAccount: "Create account",
+    fullName: "Full name",
+    role: "Role",
+    student: "Student",
+    instructor: "Instructor",
+    admin: "Admin",
+  },
+} as const;
+
+export function t(language: Language, key: keyof (typeof dictionary)["vi"]) {
+  return dictionary[language][key];
+}

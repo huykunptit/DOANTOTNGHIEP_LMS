@@ -17,18 +17,16 @@ subprojects {
     apply(plugin = "java")
     apply(plugin = "io.spring.dependency-management")
 
-    extra["springCloudVersion"] = "2023.0.5"
-
-    java {
-        toolchain {
-            languageVersion = JavaLanguageVersion.of(21)
+    // Import Spring Boot BOM for all subprojects (including common-lib which doesn't apply the Boot plugin)
+    configure<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension> {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:3.3.6")
         }
     }
 
-    dependencyManagement {
-        imports {
-            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-        }
+    java {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     tasks.withType<Test> {

@@ -1,0 +1,10 @@
+package com.eript.lms.academic.dto.request;
+
+public record InstitutionRequest(
+        String code,
+        String name,
+        String shortName,
+        String description,
+        Boolean active
+) {
+}

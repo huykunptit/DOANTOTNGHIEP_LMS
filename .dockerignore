@@ -1,0 +1,11 @@
+.git
+**/.git
+**/.gradle
+**/build
+**/out
+**/node_modules
+**/.next
+**/.cache
+**/dist
+**/.idea
+**/terminals
