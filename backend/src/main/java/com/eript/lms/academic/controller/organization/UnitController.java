@@ -3,6 +3,7 @@ package com.eript.lms.academic.controller.organization;
 import com.eript.lms.academic.dto.request.UnitRequest;
 import com.eript.lms.academic.dto.response.UnitResponse;
 import com.eript.lms.academic.service.organization.UnitService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +27,12 @@ public class UnitController {
     private final UnitService unitService;
 
     @PostMapping
-    public ResponseEntity<UnitResponse> create(@RequestBody UnitRequest request) {
+    public ResponseEntity<UnitResponse> create(@Valid @RequestBody UnitRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(unitService.create(request));
     }
 
     @PutMapping("/{id}")
-    public UnitResponse update(@PathVariable Long id, @RequestBody UnitRequest request) {
+    public UnitResponse update(@PathVariable Long id, @Valid @RequestBody UnitRequest request) {
         return unitService.update(id, request);
     }
 

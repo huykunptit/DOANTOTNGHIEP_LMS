@@ -5,7 +5,7 @@ function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card text-card-foreground shadow-sm",
+        "rounded-2xl border border-border bg-card text-card-foreground shadow-none transition-colors hover:border-[#6C8572] overflow-hidden",
         className
       )}
       {...props}
@@ -15,14 +15,14 @@ function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
 
 function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("flex flex-col space-y-1.5 p-6", className)} {...props} />
+    <div className={cn("flex flex-col space-y-1.5 p-4 md:p-6 bg-[#EEF7F2] border-b border-border", className)} {...props} />
   );
 }
 
 function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
   return (
     <h3
-      className={cn("text-2xl font-semibold leading-none tracking-tight", className)}
+      className={cn("text-2xl font-semibold leading-none tracking-tight text-foreground", className)}
       {...props}
     />
   );

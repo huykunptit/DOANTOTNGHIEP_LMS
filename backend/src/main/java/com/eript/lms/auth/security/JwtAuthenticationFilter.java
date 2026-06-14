@@ -1,10 +1,15 @@
 package com.eript.lms.auth.security;
 
+import com.eript.lms.auth.service.TokenBlacklistService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,18 +24,9 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Add comment for each line of code
-    // 1. Get the authorization header
-    // 2. Check if the authorization header is null or does not start with "Bearer "
-    // 3. If the authorization header is null or does not start with "Bearer ", do nothing
-    // 4. If the authorization header is not null and starts with "Bearer ", get the token
-    // 5. If the token is not valid, do nothing
-    // 6. If the token is valid, get the user id and roles
-    // 7. Create a list of authorities from the roles
-    // 8. Create a new authentication token with the user id and authorities
-    // 9. Set the authentication token in the security context
-    // 10. Do the next filter
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -44,8 +40,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (!jwtService.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
+        JwtService.TokenStatus status = jwtService.checkTokenStatus(token);
+
+        if (status == JwtService.TokenStatus.VALID) {
+            try {
+                String jti = jwtService.extractJti(token);
+                if (tokenBlacklistService.isBlacklisted(jti)) {
+                    writeProblem(response, HttpStatus.UNAUTHORIZED, "Token Revoked",
+                            "Access token has been revoked.");
+                    return;
+                }
+            } catch (Exception ignored) {
+                // extractJti failure falls through to normal invalid handling below
+            }
+        }
+
+        if (status == JwtService.TokenStatus.EXPIRED) {
+            writeProblem(response, HttpStatus.UNAUTHORIZED, "Token Expired",
+                    "Access token has expired. Please refresh.");
+            return;
+        }
+
+        if (status == JwtService.TokenStatus.INVALID) {
+            writeProblem(response, HttpStatus.UNAUTHORIZED, "Invalid Token",
+                    "Access token is invalid.");
             return;
         }
 
@@ -61,6 +79,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         filterChain.doFilter(request, response);
+    }
+
+    private void writeProblem(HttpServletResponse response, HttpStatus status, String title, String detail)
+            throws IOException {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(status, detail);
+        pd.setTitle(title);
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
+        objectMapper.writeValue(response.getWriter(), pd);
     }
 }
 

@@ -70,6 +70,7 @@ public class Course {
     private String courseMode;
 
     @Column(name = "is_credit_bearing", nullable = false)
+    @Builder.Default
     private Boolean creditBearing = false;
 
     @Column(name = "credit_value")
@@ -91,6 +92,7 @@ public class Course {
     private Long certificateTemplateId;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "course")

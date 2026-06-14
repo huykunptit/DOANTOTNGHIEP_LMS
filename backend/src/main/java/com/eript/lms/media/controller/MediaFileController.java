@@ -3,6 +3,7 @@ package com.eript.lms.media.controller;
 import com.eript.lms.media.dto.request.MediaFileRequest;
 import com.eript.lms.media.dto.response.MediaFileResponse;
 import com.eript.lms.media.service.MediaFileService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,10 +25,21 @@ import java.util.List;
 public class MediaFileController {
 
     private final MediaFileService mediaFileService;
+    private final com.eript.lms.media.service.FileStorageService fileStorageService;
 
     @PostMapping
-    public ResponseEntity<MediaFileResponse> create(@RequestBody MediaFileRequest request) {
+    public ResponseEntity<MediaFileResponse> create(@Valid @RequestBody MediaFileRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mediaFileService.create(request));
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<com.eript.lms.media.entity.MediaFile> uploadFile(
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(value = "scope", defaultValue = "general") String scope
+    ) {
+        Long uploaderId = 1L; // Temporarily hardcode uploaderId for testing until SecurityContext is configured for this endpoint
+        com.eript.lms.media.entity.MediaFile uploadedFile = fileStorageService.storeFile(file, uploaderId, scope);
+        return new ResponseEntity<>(uploadedFile, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -43,7 +55,7 @@ public class MediaFileController {
     }
 
     @PutMapping("/{id}")
-    public MediaFileResponse update(@PathVariable Long id, @RequestBody MediaFileRequest request) {
+    public MediaFileResponse update(@PathVariable Long id, @Valid @RequestBody MediaFileRequest request) {
         return mediaFileService.update(id, request);
     }
 

@@ -55,15 +55,18 @@ public class Exam {
     private LocalDateTime endsAt;
 
     @Column(name = "shuffle_questions", nullable = false)
+    @Builder.Default
     private Boolean shuffleQuestions = false;
 
     @Column(name = "shuffle_answers", nullable = false)
+    @Builder.Default
     private Boolean shuffleAnswers = false;
 
     @Column(name = "review_options", columnDefinition = "TEXT")
     private String reviewOptions;
 
     @Column(name = "proctoring_enabled", nullable = false)
+    @Builder.Default
     private Boolean proctoringEnabled = false;
 
     @Column(name = "proctoring_settings", columnDefinition = "TEXT")

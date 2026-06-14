@@ -41,8 +41,6 @@ public class Cohort {
     private Integer endYear;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
-
-    @OneToMany(mappedBy = "cohort")
-    private List<AdministrativeClass> administrativeClasses;
 }

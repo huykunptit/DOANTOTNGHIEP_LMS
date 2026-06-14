@@ -1,103 +1,244 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight, CalendarDays, CheckCircle2, Clock3, PlayCircle, Star } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { getCourse } from "@/lib/api";
+import { use } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import {
+  BookOpen, CheckCircle2, GraduationCap, Loader2, PlayCircle,
+} from "lucide-react";
+import { toast } from "sonner";
+import { getCourse, getCourseContent, enrollCourse, getEnrolledCourses, checkout } from "@/lib/api";
+import { useAuthStore } from "@/stores/auth";
 
-export default function CourseDetailPage({ params }: { params: { id: string } }) {
+export default function CourseDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  const router = useRouter();
+  const qc = useQueryClient();
+  const isLoggedIn = useAuthStore((s) => !!s.accessToken);
+
   const { data: course, isLoading } = useQuery({
-    queryKey: ["course", params.id],
-    queryFn: () => getCourse(params.id),
+    queryKey: ["course", id],
+    queryFn: () => getCourse(id),
   });
 
-  if (isLoading || !course) {
-    return <main className="min-h-screen bg-slate-950 text-white px-6 py-8 lg:px-8"><div className="mx-auto max-w-7xl rounded-[2rem] border border-white/10 bg-white/5 p-10 animate-pulse">Loading course...</div></main>;
+  const { data: content } = useQuery({
+    queryKey: ["course-content", id],
+    queryFn: () => getCourseContent(id),
+  });
+
+  const { data: enrolled } = useQuery({
+    queryKey: ["enrolled-courses"],
+    queryFn: getEnrolledCourses,
+    enabled: isLoggedIn,
+  });
+
+  const isEnrolled = (Array.isArray(enrolled) ? enrolled : []).some(
+    (c) => c.id === Number(id)
+  );
+
+  const enrollMutation = useMutation({
+    mutationFn: () => enrollCourse(id),
+    onSuccess: () => {
+      toast.success("Đăng ký thành công!");
+      qc.invalidateQueries({ queryKey: ["enrolled-courses"] });
+      qc.invalidateQueries({ queryKey: ["student-stats"] });
+      router.push(`/student/courses/${id}/learn`);
+    },
+    onError: (err: Error) => {
+      if (err.message?.toLowerCase().includes("already")) {
+        router.push(`/student/courses/${id}/learn`);
+      } else {
+        toast.error(err.message || "Đăng ký thất bại");
+      }
+    },
+  });
+
+  const checkoutMutation = useMutation({
+    mutationFn: () => checkout(Number(id)),
+    onSuccess: (res) => {
+      if (res.status === "FREE") {
+        toast.success("Đăng ký thành công!");
+        qc.invalidateQueries({ queryKey: ["enrolled-courses"] });
+        router.push(`/student/courses/${id}/learn`);
+      } else if (res.checkoutUrl) {
+        window.location.href = res.checkoutUrl;
+      }
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const handleCTA = () => {
+    if (!isLoggedIn) { router.push(`/login?redirect=/courses/${id}`); return; }
+    if (isEnrolled) { router.push(`/student/courses/${id}/learn`); return; }
+    const price = (course as any)?.price ?? 0;
+    if (price > 0) checkoutMutation.mutate();
+    else enrollMutation.mutate();
+  };
+
+  const pending = enrollMutation.isPending || checkoutMutation.isPending;
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-[#F7FAF8]">
+        <Loader2 className="h-8 w-8 animate-spin text-[#166534]" />
+      </div>
+    );
   }
 
+  if (!course) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#F7FAF8]">
+        <BookOpen className="h-12 w-12 text-[#B3CCBC]" />
+        <p className="text-[#6C8572]">Không tìm thấy khóa học.</p>
+      </div>
+    );
+  }
+
+  const price = (course as any).price ?? 0;
+  const title = (course as any).title ?? (course as any).name ?? `Khóa học #${course.id}`;
+  const totalLessons =
+    content?.reduce((s, sec) => s + (sec.lessons?.length ?? 0), 0) ?? 0;
+
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
-        <div className="grid gap-8 lg:grid-cols-[1.35fr_0.65fr]">
-          <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 lg:p-8">
-            <p className="text-xs font-medium uppercase tracking-[0.3em] text-blue-200/80">Course detail</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight">{course.title}</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400">{course.description}</p>
-
-            <div className="mt-6 flex flex-wrap gap-3 text-sm text-slate-300">
-              <span className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-2">{course.level}</span>
-              <span className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-2 flex items-center gap-2"><Star className="h-4 w-4 text-amber-300" /> {course.rating} rating</span>
-              <span className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-2 flex items-center gap-2"><Clock3 className="h-4 w-4 text-blue-200" /> {course.lessons} lessons</span>
-            </div>
-
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {[
-                ["Instructor", course.instructor],
-                ["Updated", course.updatedAt],
-                ["Duration", course.duration],
-              ].map(([label, value]) => (
-                <div key={label} className="rounded-3xl border border-white/10 bg-slate-950/40 p-4">
-                  <div className="text-sm text-slate-400">{label}</div>
-                  <div className="mt-1 text-base font-medium">{value}</div>
+    <div className="min-h-screen bg-[#F7FAF8]">
+      {/* Hero */}
+      <div className="border-b border-[#B3CCBC] bg-white">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[1fr_320px]">
+            {/* Course info */}
+            <div>
+              <span className="rounded-full bg-[#EEF7F2] px-3 py-1 text-xs font-semibold text-[#166534]">
+                {(course as any).code ?? "IT"}
+              </span>
+              <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#0A1F12] md:text-4xl">
+                {title}
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#3E5448]">
+                {(course as any).description ?? "Khóa học thuộc chương trình đào tạo."}
+              </p>
+              <div className="mt-6 flex flex-wrap gap-4 text-sm text-[#6C8572]">
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="h-4 w-4 text-[#166534]" />
+                  {totalLessons} bài học
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-8">
-              <h2 className="text-lg font-semibold">Learning outcomes</h2>
-              <div className="mt-4 space-y-3">
-                {course.outcomes.map((item) => (
-                  <div key={item} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-slate-950/40 p-4 text-sm text-slate-300">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4 text-blue-200" />
-                    <span>{item}</span>
+                {(course as any).creditValue && (
+                  <div className="flex items-center gap-1.5">
+                    <GraduationCap className="h-4 w-4 text-[#166534]" />
+                    {(course as any).creditValue} tín chỉ
                   </div>
-                ))}
+                )}
+                {(course as any).courseMode && (
+                  <div className="flex items-center gap-1.5">
+                    <PlayCircle className="h-4 w-4 text-[#166534]" />
+                    {(course as any).courseMode === "ONLINE"
+                      ? "Trực tuyến"
+                      : (course as any).courseMode === "OFFLINE"
+                      ? "Trực tiếp"
+                      : "Kết hợp"}
+                  </div>
+                )}
               </div>
             </div>
-          </section>
 
-          <aside className="space-y-6">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-slate-400">Current progress</p>
-                  <div className="mt-1 text-3xl font-semibold">{course.progress}%</div>
+            {/* CTA card */}
+            <div className="rounded-2xl border border-[#B3CCBC] bg-white p-6 shadow-[0_4px_16px_rgba(13,92,49,0.08)] lg:self-start">
+              <div className="text-3xl font-bold text-[#0A1F12]">
+                {price > 0 ? `${price.toLocaleString("vi-VN")} ₫` : "Miễn phí"}
+              </div>
+
+              {isEnrolled && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg bg-[#DCFCE7] px-3 py-2">
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-[#166534]" />
+                  <span className="text-xs font-medium text-[#166534]">
+                    Bạn đã đăng ký khóa học này
+                  </span>
                 </div>
-                <PlayCircle className="h-6 w-6 text-blue-200" />
-              </div>
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
-                <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-cyan-400" style={{ width: `${course.progress}%` }} />
-              </div>
-              <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-blue-500 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-400">
-                Continue learning <ArrowRight className="h-4 w-4" />
+              )}
+
+              <button
+                onClick={handleCTA}
+                disabled={pending}
+                className="mt-4 h-11 w-full rounded-lg bg-[#166534] text-sm font-semibold text-white transition hover:bg-[#0D5C31] disabled:opacity-45"
+              >
+                {pending ? (
+                  <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                ) : isEnrolled ? (
+                  "Tiếp tục học"
+                ) : price > 0 ? (
+                  "Mua khóa học"
+                ) : (
+                  "Đăng ký miễn phí"
+                )}
               </button>
-            </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-              <h2 className="text-lg font-semibold">Course contents</h2>
-              <div className="mt-5 space-y-3">
-                {course.lessonsList.map((lesson, index) => (
-                  <div key={lesson.title} className="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-950/40 px-4 py-3">
-                    <div>
-                      <div className="text-sm font-medium">{index + 1}. {lesson.title}</div>
-                      <div className="text-xs text-slate-400">Lesson</div>
-                    </div>
-                    <span className="text-sm text-slate-400">{lesson.time}</span>
-                  </div>
-                ))}
-              </div>
+              {!isLoggedIn && (
+                <p className="mt-3 text-center text-xs text-[#6C8572]">
+                  Cần đăng nhập để đăng ký
+                </p>
+              )}
             </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-              <h2 className="text-lg font-semibold">Schedule</h2>
-              <div className="mt-4 space-y-3 text-sm text-slate-300">
-                <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/40 p-4"><CalendarDays className="h-4 w-4 text-blue-200" /> Weekly live review: Friday 19:00</div>
-                <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/40 p-4"><Clock3 className="h-4 w-4 text-blue-200" /> Next checkpoint: Lesson 4 quiz</div>
-              </div>
-            </div>
-          </aside>
+          </div>
         </div>
       </div>
-    </main>
+
+      {/* Course content */}
+      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
+        <h2 className="text-xl font-bold text-[#0A1F12]">Nội dung khóa học</h2>
+
+        {content && content.length > 0 ? (
+          <div className="mt-5 space-y-4">
+            {content.map((section) => (
+              <div
+                key={section.id}
+                className="rounded-2xl border border-[#B3CCBC] bg-white overflow-hidden"
+              >
+                {/* Section header */}
+                <div className="border-b border-[#B3CCBC] bg-[#EEF7F2] px-5 py-3">
+                  <h3 className="font-semibold text-[#0A1F12]">{section.title}</h3>
+                  {section.lessons && (
+                    <p className="mt-0.5 text-xs text-[#6C8572]">
+                      {section.lessons.length} bài học
+                    </p>
+                  )}
+                </div>
+
+                {/* Lessons list */}
+                <div className="divide-y divide-[#B3CCBC]">
+                  {section.lessons?.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className="flex items-center gap-3 px-5 py-3"
+                    >
+                      <PlayCircle className="h-4 w-4 shrink-0 text-[#166534]" />
+                      <span className="flex-1 text-sm text-[#3E5448]">{lesson.title}</span>
+                      <div className="flex items-center gap-2">
+                        {lesson.duration ? (
+                          <span className="text-xs text-[#6C8572]">{lesson.duration} phút</span>
+                        ) : null}
+                        {lesson.preview && (
+                          <span className="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-xs font-medium text-[#1D4ED8]">
+                            Preview
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-5 flex flex-col items-center rounded-2xl border border-[#B3CCBC] bg-white py-14 text-center">
+            <BookOpen className="h-12 w-12 text-[#B3CCBC]" />
+            <h3 className="mt-4 text-base font-semibold text-[#0A1F12]">
+              Nội dung đang được cập nhật
+            </h3>
+            <p className="mt-2 max-w-xs text-sm text-[#6C8572]">
+              Vui lòng quay lại sau để xem nội dung khóa học.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

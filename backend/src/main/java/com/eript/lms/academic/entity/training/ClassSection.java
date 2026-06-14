@@ -53,7 +53,4 @@ public class ClassSection {
 
     @Column(nullable = false, length = 50)
     private String status;
-
-    @OneToMany(mappedBy = "classSection")
-    private List<AdministrativeClassClassSection> administrativeClassLinks;
 }

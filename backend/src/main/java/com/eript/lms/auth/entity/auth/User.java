@@ -104,9 +104,6 @@ public class User {
     @Column(name = "cohort_id")
     private Long cohortId;
 
-    @Column(name = "administrative_class_id")
-    private Long administrativeClassId;
-
     @Column(name = "advisor_id")
     private Long advisorId;
 
@@ -117,6 +114,7 @@ public class User {
     private String rememberToken;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @Builder.Default

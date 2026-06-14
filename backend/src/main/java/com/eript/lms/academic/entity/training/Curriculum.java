@@ -60,6 +60,7 @@ public class Curriculum {
     private Integer totalCredits;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "curriculum")

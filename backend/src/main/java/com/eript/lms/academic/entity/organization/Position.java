@@ -41,6 +41,7 @@ public class Position {
     private String description;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "position")

@@ -8,7 +8,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-ARG NEXT_PUBLIC_API_BASE=http://api-gateway:8080
+# Build-time API base (server-side). Browser calls go through Next.js rewrites.
+ARG NEXT_PUBLIC_API_BASE=http://api-gateway:8081
 ENV NEXT_PUBLIC_API_BASE=$NEXT_PUBLIC_API_BASE
 RUN npm run build
 

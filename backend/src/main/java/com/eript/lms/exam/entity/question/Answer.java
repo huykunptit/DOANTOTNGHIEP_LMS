@@ -38,6 +38,7 @@ public class Answer {
     private String subContent;
 
     @Column(name = "is_correct", nullable = false)
+    @Builder.Default
     private Boolean correct = false;
 
     @Column(name = "sort_order")

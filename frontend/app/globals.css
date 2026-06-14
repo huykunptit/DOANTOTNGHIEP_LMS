@@ -1,36 +1,100 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(222.2 84% 4.9%);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(222.2 84% 4.9%);
-  --color-primary: hsl(221.2 83.2% 53.3%);
-  --color-primary-foreground: hsl(210 40% 98%);
-  --color-secondary: hsl(210 40% 96.1%);
-  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
-  --color-muted: hsl(210 40% 96.1%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --color-accent: hsl(210 40% 96.1%);
-  --color-accent-foreground: hsl(222.2 47.4% 11.2%);
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-  --color-border: hsl(214.3 31.8% 91.4%);
-  --color-input: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(221.2 83.2% 53.3%);
+  /* EduVerde Design System — Light Theme */
+
+  --color-background: #F7FAF8;
+  --color-foreground: #0A1F12;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0A1F12;
+
+  --color-primary: #0D5C31;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #2D6A4C;
+  --color-secondary-foreground: #FFFFFF;
+
+  --color-muted: #EEF7F2;
+  --color-muted-foreground: #6C8572;
+  --color-accent: #E2F1E9;
+  --color-accent-foreground: #166534;
+
+  --color-destructive: #BA1A1A;
+  --color-destructive-foreground: #FFFFFF;
+  --color-warning: #B45309;
+  --color-warning-foreground: #FFFFFF;
+  --color-success: #166534;
+  --color-success-foreground: #FFFFFF;
+  --color-info: #1D4ED8;
+  --color-info-foreground: #FFFFFF;
+
+  --color-border: #B3CCBC;
+  --color-input: #6C8572;
+  --color-ring: rgba(22, 101, 52, 0.15);
+
   --radius: 0.5rem;
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  --radius-lg: 1rem;
+  --radius-md: 0.75rem;
+  --radius-sm: 0.25rem;
+
+  --font-sans: var(--font-sans);
 }
 
 @layer base {
   * {
     border-color: var(--color-border);
+    -webkit-tap-highlight-color: transparent;
   }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
   }
 }
 
+/* ─── iOS Safari: prevent auto-zoom on input focus (must override text-sm) ─── */
+@media (max-width: 767px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* ─── iPhone safe-area for bottom nav ─── */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Fixed elements that need safe area */
+.bottom-nav-safe {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+/* ─── Sidebar colors ─── */
+:root {
+  --sidebar: #0D5C31;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #166534;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 255, 255, 0.1);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-ring: #52C47E;
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}

@@ -70,6 +70,7 @@ public class Question {
     private String metadata;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "question")

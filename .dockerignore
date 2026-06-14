@@ -9,3 +9,9 @@
 **/dist
 **/.idea
 **/terminals
+mobile/
+.env
+*.env.local
+*.log
+.cursor/
+.antigravitycli/

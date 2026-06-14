@@ -22,19 +22,44 @@ interface AuthState {
   hasRole: (role: string) => boolean;
 }
 
+const COOKIE_NAME = "access_token";
+
+function writeCookie(token: string | null) {
+  if (typeof document === "undefined") return;
+  if (token) {
+    document.cookie = `${COOKIE_NAME}=${token}; path=/; SameSite=Lax; max-age=86400`;
+  } else {
+    document.cookie = `${COOKIE_NAME}=; path=/; SameSite=Lax; max-age=0`;
+  }
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       user: null,
       accessToken: null,
       refreshToken: null,
-      setAuth: (user, accessToken, refreshToken) => set({ user, accessToken, refreshToken }),
+      setAuth: (user, accessToken, refreshToken) => {
+        writeCookie(accessToken);
+        set({ user, accessToken, refreshToken });
+      },
       setUser: (user) => set({ user }),
-      setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-      logout: () => set({ user: null, accessToken: null, refreshToken: null }),
+      setTokens: (accessToken, refreshToken) => {
+        writeCookie(accessToken);
+        set({ accessToken, refreshToken });
+      },
+      logout: () => {
+        writeCookie(null);
+        set({ user: null, accessToken: null, refreshToken: null });
+      },
       isAuthenticated: () => !!get().accessToken,
       hasRole: (role) => get().user?.roles.includes(role) ?? false,
     }),
-    { name: "auth-storage" }
+    {
+      name: "auth-storage",
+      onRehydrateStorage: () => (state) => {
+        if (state?.accessToken) writeCookie(state.accessToken);
+      },
+    }
   )
 );

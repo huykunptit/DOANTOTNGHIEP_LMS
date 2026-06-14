@@ -1,0 +1,54 @@
+{
+  "truong": "Học viện Công nghệ Bưu chính Viễn thông (PTIT)",
+  "website": "https://dec.ptit.edu.vn",
+  "hinh_thuc": "Đại học từ xa - Đợt 5 năm 2025",
+  "nganh": [
+    {
+      "ten_nganh": "Công nghệ Thông tin",
+      "ma_nganh": "7480201",
+      "thoi_gian": "4.5 năm (9 học kỳ)",
+      "tong_tin_chi": 152,
+      "mon_hoc": [
+        { "tt": 1,  "ten_mon": "Nhập môn Internet và eLearning",  "ma_mon": "INT11176", "so_tc": 2, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 2,  "ten_mon": "Triết học Mác-Lênin",             "ma_mon": "BAS1150",  "so_tc": 3, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 3,  "ten_mon": "Đại số",                          "ma_mon": "BAS1201",  "so_tc": 3, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 4,  "ten_mon": "Giải tích 1",                     "ma_mon": "BAS1203",  "so_tc": 3, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 5,  "ten_mon": "Tin học cơ sở 1",                 "ma_mon": "INT1154",  "so_tc": 2, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 6,  "ten_mon": "Kinh tế chính trị Mác-Lênin",    "ma_mon": "BAS1151",  "so_tc": 2, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 7,  "ten_mon": "Vật lý 1 và thí nghiệm",         "ma_mon": "BAS1224",  "so_tc": 4, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 8,  "ten_mon": "Kỹ năng tạo lập văn bản",        "ma_mon": "SKD1103",  "so_tc": 1, "hoc_ky": "HK1", "ghi_chu": "Bắt buộc" },
+        { "tt": 9,  "ten_mon": "Xác suất thống kê",               "ma_mon": "BAS1226",  "so_tc": 2, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 10, "ten_mon": "Tiếng Anh A11",                   "ma_mon": "BAS1141",  "so_tc": 3, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 11, "ten_mon": "Giải tích 2",                     "ma_mon": "BAS1204",  "so_tc": 3, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 12, "ten_mon": "Tin học cơ sở 2",                 "ma_mon": "INT1155",  "so_tc": 2, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 13, "ten_mon": "Kỹ thuật số",                     "ma_mon": "ELE1433",  "so_tc": 2, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 14, "ten_mon": "Chủ nghĩa xã hội khoa học",      "ma_mon": "BAS1152",  "so_tc": 2, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 15, "ten_mon": "Xử lý tín hiệu số",               "ma_mon": "ELE1330",  "so_tc": 2, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 16, "ten_mon": "Vật lý 3 và thí nghiệm",         "ma_mon": "BAS1227",  "so_tc": 4, "hoc_ky": "HK2", "ghi_chu": "Bắt buộc" },
+        { "tt": 17, "ten_mon": "Tiếng Anh A12",                   "ma_mon": "BAS1142",  "so_tc": 4, "hoc_ky": "HK3", "ghi_chu": "Bắt buộc" },
+        { "tt": 18, "ten_mon": "Toán rời rạc 1",                  "ma_mon": "INT1358",  "so_tc": 3, "hoc_ky": "HK3", "ghi_chu": "Bắt buộc" },
+        { "tt": 19, "ten_mon": "Ngôn ngữ lập trình C++",          "ma_mon": "INT1339",  "so_tc": 3, "hoc_ky": "HK3", "ghi_chu": "Bắt buộc" },
+        { "tt": 20, "ten_mon": "Tư tưởng Hồ Chí Minh",           "ma_mon": "BAS1122",  "so_tc": 2, "hoc_ky": "HK3", "ghi_chu": "Bắt buộc" },
+        { "tt": 21, "ten_mon": "Lý thuyết thông tin",             "ma_mon": "ELE1319",  "so_tc": 3, "hoc_ky": "HK3", "ghi_chu": "Bắt buộc" },
+        { "tt": 22, "ten_mon": "Kiến trúc máy tính",              "ma_mon": "INT13145", "so_tc": 3, "hoc_ky": "HK3", "ghi_chu": "Bắt buộc" }
+      ],
+      "luu_y": "Dữ liệu HK4–HK9 không trích xuất được (trang PDF là ảnh raster). Tổng 22/152 tín chỉ đã có."
+    },
+    {
+      "ten_nganh": "Kỹ thuật Điện tử Viễn thông",
+      "ma_nganh": "7520207",
+      "thoi_gian": "4.5 năm (9 học kỳ)",
+      "tong_tin_chi": 152,
+      "mon_hoc": [],
+      "luu_y": "Toàn bộ danh sách môn học nằm trong trang PDF dạng ảnh raster, không thể trích xuất. Xem tại https://dec.ptit.edu.vn"
+    },
+    {
+      "ten_nganh": "Quản trị Kinh doanh",
+      "ma_nganh": "7340101",
+      "thoi_gian": "4 năm (8 học kỳ)",
+      "tong_tin_chi_range": "125-132",
+      "mon_hoc": [],
+      "luu_y": "Toàn bộ danh sách môn học nằm trong trang PDF dạng ảnh raster, không thể trích xuất. Xem tại https://dec.ptit.edu.vn"
+    }
+  ]
+}

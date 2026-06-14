@@ -55,6 +55,7 @@ public class Program {
     private String degreeLevel;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "program")

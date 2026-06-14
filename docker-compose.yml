@@ -1,7 +1,8 @@
 services:
   mysql:
-    image: mysql:8.4
+    image: mysql:8.0
     container_name: lms-mysql
+    restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: lms_db
@@ -14,37 +15,117 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+    networks:
+      - lms-net
 
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
     container_name: lms-backend
+    restart: unless-stopped
     ports:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/lms_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      JWT_SECRET: "${JWT_SECRET:-lms-dev-only-secret-key-must-be-at-least-256-bits-long-for-hs256}"
+      CORS_ORIGINS: "${CORS_ORIGINS:-http://localhost:3000,http://localhost}"
+      MAIL_HOST: "${MAIL_HOST:-}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      MAIL_FROM: "${MAIL_FROM:-no-reply@lms.local}"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
+      PAYOS_CLIENT_ID: "${PAYOS_CLIENT_ID:-}"
+      PAYOS_API_KEY: "${PAYOS_API_KEY:-}"
+      PAYOS_CHECKSUM_KEY: "${PAYOS_CHECKSUM_KEY:-}"
+      MINIO_ENDPOINT: "http://minio:9000"
+      MINIO_ACCESS_KEY: "${MINIO_ROOT_USER:-minioadmin}"
+      MINIO_SECRET_KEY: "${MINIO_ROOT_PASSWORD:-minioadmin123}"
+      MINIO_BUCKET: "lms-media"
+      FRONTEND_BASE_URL: "${FRONTEND_BASE_URL:-http://localhost:3000}"
+    volumes:
+      - ./backend/uploads:/app/uploads
     depends_on:
       mysql:
         condition: service_healthy
+      minio:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/actuator/health || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - lms-net
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: lms-gateway
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      CORS_ORIGINS: "${CORS_ORIGINS:-http://localhost:3000,http://localhost}"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - lms-net
+
+  minio:
+    image: minio/minio:latest
+    container_name: lms-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:-minioadmin}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:-minioadmin123}"
+    volumes:
+      - minio_data:/data
+    networks:
+      - lms-net
+
+  ai-service:
+    build:
+      context: ./ai-service
+    container_name: lms-ai-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
+    networks:
+      - lms-net
 
   frontend:
     build:
       context: ./frontend
       args:
-        NEXT_PUBLIC_API_BASE: http://backend:8080
+        NEXT_PUBLIC_API_BASE: http://api-gateway:8081
     container_name: lms-frontend
+    restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_API_BASE: http://backend:8080
+      NEXT_PUBLIC_API_BASE: http://api-gateway:8081
       NODE_ENV: production
     depends_on:
-      backend:
-        condition: service_started
+      - api-gateway
+      - ai-service
+    networks:
+      - lms-net
 
 volumes:
   mysql_data:
+  minio_data:
+
+networks:
+  lms-net:
+    driver: bridge

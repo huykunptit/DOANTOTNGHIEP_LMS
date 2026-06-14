@@ -41,6 +41,7 @@ public class Institution {
     private String description;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "institution")

@@ -1,0 +1,65 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "${CORS_ORIGINS:http://localhost:3000}"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowedHeaders: "*"
+            allowCredentials: true
+      routes:
+        - id: ai-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/v1/ai/**
+        - id: backend-api
+          uri: http://localhost:8080
+          predicates:
+            - Path=/api/v1/**
+          filters:
+            - AddRequestHeader=X-Gateway, eript-lms
+        - id: backend-oauth2
+          uri: http://localhost:8080
+          predicates:
+            - Path=/oauth2/**,/login/oauth2/**
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+  cloud:
+    gateway:
+      routes:
+        - id: ai-service
+          uri: http://ai-service:8082
+          predicates:
+            - Path=/api/v1/ai/**
+        - id: backend-api
+          uri: http://backend:8080
+          predicates:
+            - Path=/api/v1/**
+          filters:
+            - AddRequestHeader=X-Gateway, eript-lms
+        - id: backend-oauth2
+          uri: http://backend:8080
+          predicates:
+            - Path=/oauth2/**,/login/oauth2/**

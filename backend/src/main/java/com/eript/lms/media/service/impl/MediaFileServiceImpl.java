@@ -3,7 +3,7 @@ package com.eript.lms.media.service.impl;
 import com.eript.lms.media.dto.request.MediaFileRequest;
 import com.eript.lms.media.dto.response.MediaFileResponse;
 import com.eript.lms.media.entity.MediaFile;
-import com.eript.lms.media.exception.ResourceNotFoundException;
+import com.eript.lms.exception.ResourceNotFoundException;
 import com.eript.lms.media.mapper.MediaFileMapper;
 import com.eript.lms.media.repository.MediaFileRepository;
 import com.eript.lms.media.service.MediaFileService;

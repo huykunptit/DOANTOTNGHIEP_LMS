@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -49,18 +50,19 @@ public class Term {
     private LocalDate endDate;
 
     @Column(name = "enrollment_start_at")
-    private LocalDate enrollmentStartAt;
+    private LocalDateTime enrollmentStartAt;
 
     @Column(name = "enrollment_end_at")
-    private LocalDate enrollmentEndAt;
+    private LocalDateTime enrollmentEndAt;
 
     @Column(name = "exam_start_at")
-    private LocalDate examStartAt;
+    private LocalDateTime examStartAt;
 
     @Column(name = "exam_end_at")
-    private LocalDate examEndAt;
+    private LocalDateTime examEndAt;
 
     @Column(name = "is_current", nullable = false)
+    @Builder.Default
     private Boolean current = false;
 
     @OneToMany(mappedBy = "term")

@@ -41,6 +41,7 @@ public class QuizAttempt {
     private BigDecimal score;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean passed = false;
 
     @Column(name = "question_ids", columnDefinition = "TEXT")

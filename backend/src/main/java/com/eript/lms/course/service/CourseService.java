@@ -13,7 +13,11 @@ public interface CourseService {
 
     CourseResponse getById(Long id);
 
-    List<CourseResponse> getAll();
+    org.springframework.data.domain.Page<CourseResponse> getAll(String search, org.springframework.data.domain.Pageable pageable);
+
+    void enroll(Long courseId, Long userId);
+    List<CourseResponse> getEnrolledCourses(Long userId);
+    List<CourseResponse> getInstructorCourses(Long instructorId);
 
     void delete(Long id);
 }

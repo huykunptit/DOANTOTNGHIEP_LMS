@@ -16,4 +16,10 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     boolean existsByCode(String code);
 
     boolean existsBySlug(String slug);
+
+    org.springframework.data.domain.Page<Course> findByTitleContainingIgnoreCaseOrCodeContainingIgnoreCase(String title, String code, org.springframework.data.domain.Pageable pageable);
+
+    java.util.List<Course> findByUserId(Long userId);
+
+    long countByActive(Boolean active);
 }

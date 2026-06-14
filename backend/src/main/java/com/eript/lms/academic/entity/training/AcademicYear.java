@@ -42,6 +42,7 @@ public class AcademicYear {
     private LocalDate endDate;
 
     @Column(name = "is_current", nullable = false)
+    @Builder.Default
     private Boolean current = false;
 
     @OneToMany(mappedBy = "academicYear")

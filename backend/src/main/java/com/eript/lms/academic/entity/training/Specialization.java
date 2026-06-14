@@ -42,6 +42,7 @@ public class Specialization {
     private String name;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "specialization")

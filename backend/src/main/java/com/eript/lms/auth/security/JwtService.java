@@ -3,7 +3,9 @@ package com.eript.lms.auth.security;
 import com.eript.lms.auth.config.JwtProperties;
 import com.eript.lms.auth.entity.auth.User;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class JwtService {
@@ -56,6 +59,26 @@ public class JwtService {
         }
     }
 
+    public TokenStatus checkTokenStatus(String token) {
+        try {
+            parseClaims(token);
+            return TokenStatus.VALID;
+        } catch (ExpiredJwtException ex) {
+            return TokenStatus.EXPIRED;
+        } catch (JwtException | IllegalArgumentException ex) {
+            return TokenStatus.INVALID;
+        }
+    }
+
+    public enum TokenStatus {
+        VALID, EXPIRED, INVALID
+    }
+
+    public String extractJti(String token) {
+        Claims claims = parseClaims(token).getPayload();
+        return claims.getId();
+    }
+
     private String generateToken(User user, long ttlMillis) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail());
@@ -65,6 +88,7 @@ public class JwtService {
         Instant expiry = now.plusMillis(ttlMillis);
 
         return Jwts.builder()
+                .id(UUID.randomUUID().toString())
                 .claims(claims)
                 .subject(String.valueOf(user.getId()))
                 .issuedAt(Date.from(now))

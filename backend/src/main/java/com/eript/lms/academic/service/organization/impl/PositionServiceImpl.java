@@ -3,7 +3,7 @@ package com.eript.lms.academic.service.organization.impl;
 import com.eript.lms.academic.dto.request.PositionRequest;
 import com.eript.lms.academic.dto.response.PositionResponse;
 import com.eript.lms.academic.entity.organization.Position;
-import com.eript.lms.academic.exception.ResourceNotFoundException;
+import com.eript.lms.exception.ResourceNotFoundException;
 import com.eript.lms.academic.mapper.PositionMapper;
 import com.eript.lms.academic.repository.organization.PositionRepository;
 import com.eript.lms.academic.service.organization.PositionService;

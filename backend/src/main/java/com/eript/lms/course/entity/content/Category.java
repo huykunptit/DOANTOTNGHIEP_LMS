@@ -44,6 +44,7 @@ public class Category {
     private Integer sortOrder;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "category")

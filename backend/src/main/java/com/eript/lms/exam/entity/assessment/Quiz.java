@@ -57,6 +57,7 @@ public class Quiz {
     private String settings;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "quiz")

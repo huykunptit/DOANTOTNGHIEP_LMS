@@ -1,6 +1,6 @@
 package com.eript.lms.course.entity.content;
 
-import com.eript.lms.course.entity.progress.LessonProgress;
+import com.eript.lms.course.entity.LessonProgress;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -61,6 +61,7 @@ public class Lesson {
     private Integer orderIndex;
 
     @Column(name = "is_preview", nullable = false)
+    @Builder.Default
     private Boolean preview = false;
 
     @Column(nullable = false, length = 50)

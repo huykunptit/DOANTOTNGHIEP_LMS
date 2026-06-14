@@ -42,6 +42,7 @@ public class Major {
     private String name;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "major")

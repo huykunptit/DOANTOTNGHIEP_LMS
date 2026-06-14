@@ -43,7 +43,6 @@ CREATE TABLE users (
     major_id BIGINT,
     specialization_id BIGINT,
     cohort_id BIGINT,
-    administrative_class_id BIGINT,
     advisor_id BIGINT,
     email_verified_at DATETIME,
     remember_token VARCHAR(100),
@@ -136,7 +135,8 @@ CREATE TABLE program_types (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(500)
+    description VARCHAR(500),
+    active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE cohorts (
@@ -150,11 +150,15 @@ CREATE TABLE cohorts (
 
 CREATE TABLE programs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    institution_id BIGINT NOT NULL,
+    unit_id BIGINT,
     program_type_id BIGINT NOT NULL,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(500),
+    degree_level VARCHAR(100),
     active BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT fk_programs_institution FOREIGN KEY (institution_id) REFERENCES institutions(id),
+    CONSTRAINT fk_programs_unit FOREIGN KEY (unit_id) REFERENCES units(id),
     CONSTRAINT fk_programs_program_type FOREIGN KEY (program_type_id) REFERENCES program_types(id)
 );
 
@@ -181,11 +185,17 @@ CREATE TABLE specializations (
 CREATE TABLE curricula (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     program_id BIGINT NOT NULL,
+    major_id BIGINT,
+    specialization_id BIGINT,
     code VARCHAR(50) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
-    description VARCHAR(500),
+    effective_from DATE,
+    effective_to DATE,
+    total_credits INT,
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    CONSTRAINT fk_curricula_program FOREIGN KEY (program_id) REFERENCES programs(id)
+    CONSTRAINT fk_curricula_program FOREIGN KEY (program_id) REFERENCES programs(id),
+    CONSTRAINT fk_curricula_major FOREIGN KEY (major_id) REFERENCES majors(id),
+    CONSTRAINT fk_curricula_specialization FOREIGN KEY (specialization_id) REFERENCES specializations(id)
 );
 
 CREATE TABLE categories (
@@ -431,4 +441,53 @@ CREATE TABLE ai_request_logs (
     response_payload TEXT,
     token_usage INT,
     created_at DATETIME
+);
+
+CREATE TABLE lesson_progress (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    lesson_id BIGINT NOT NULL,
+    user_id BIGINT NOT NULL,
+    completed BOOLEAN NOT NULL DEFAULT FALSE,
+    completed_at DATETIME,
+    progress_percent INT,
+    last_position INT,
+    watched_seconds INT,
+    last_watched_at DATETIME,
+    CONSTRAINT fk_lesson_progress_lesson FOREIGN KEY (lesson_id) REFERENCES lessons(id)
+);
+
+CREATE TABLE user_assignments (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    unit_id BIGINT NOT NULL,
+    position_id BIGINT NOT NULL,
+    primary_assignment BOOLEAN NOT NULL DEFAULT FALSE,
+    active BOOLEAN NOT NULL DEFAULT TRUE,
+    start_date DATE,
+    end_date DATE,
+    CONSTRAINT fk_user_assignments_unit FOREIGN KEY (unit_id) REFERENCES units(id),
+    CONSTRAINT fk_user_assignments_position FOREIGN KEY (position_id) REFERENCES positions(id)
+);
+
+CREATE TABLE class_sections (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    term_id BIGINT NOT NULL,
+    course_id BIGINT NOT NULL,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    lecturer_id BIGINT,
+    capacity INT NOT NULL,
+    enrolled_count INT NOT NULL DEFAULT 0,
+    status VARCHAR(50) NOT NULL,
+    CONSTRAINT fk_class_sections_term FOREIGN KEY (term_id) REFERENCES terms(id)
+);
+
+CREATE TABLE curriculum_courses (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    curriculum_id BIGINT NOT NULL,
+    course_id BIGINT NOT NULL,
+    semester_no INT NOT NULL,
+    credits INT NOT NULL,
+    is_required BOOLEAN NOT NULL DEFAULT TRUE,
+    sort_order INT,
+    CONSTRAINT fk_curriculum_courses_curriculum FOREIGN KEY (curriculum_id) REFERENCES curricula(id)
 );

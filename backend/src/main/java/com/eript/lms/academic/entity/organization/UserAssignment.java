@@ -42,9 +42,11 @@ public class UserAssignment {
     private Position position;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean primaryAssignment = false;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @Column(name = "start_date")

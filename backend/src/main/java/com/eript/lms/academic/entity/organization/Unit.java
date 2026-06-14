@@ -52,6 +52,7 @@ public class Unit {
     private String type;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean active = true;
 
     @OneToMany(mappedBy = "parent")

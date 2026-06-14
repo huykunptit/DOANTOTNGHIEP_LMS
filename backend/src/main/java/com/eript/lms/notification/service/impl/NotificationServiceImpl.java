@@ -3,7 +3,7 @@ package com.eript.lms.notification.service.impl;
 import com.eript.lms.notification.dto.request.NotificationRequest;
 import com.eript.lms.notification.dto.response.NotificationResponse;
 import com.eript.lms.notification.entity.Notification;
-import com.eript.lms.notification.exception.ResourceNotFoundException;
+import com.eript.lms.exception.ResourceNotFoundException;
 import com.eript.lms.notification.mapper.NotificationMapper;
 import com.eript.lms.notification.repository.NotificationRepository;
 import com.eript.lms.notification.service.NotificationService;

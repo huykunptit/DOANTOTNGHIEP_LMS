@@ -3,6 +3,7 @@ package com.eript.lms.academic.controller.organization;
 import com.eript.lms.academic.dto.request.PositionRequest;
 import com.eript.lms.academic.dto.response.PositionResponse;
 import com.eript.lms.academic.service.organization.PositionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,12 @@ public class PositionController {
     private final PositionService positionService;
 
     @PostMapping
-    public ResponseEntity<PositionResponse> create(@RequestBody PositionRequest request) {
+    public ResponseEntity<PositionResponse> create(@Valid @RequestBody PositionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(positionService.create(request));
     }
 
     @PutMapping("/{id}")
-    public PositionResponse update(@PathVariable Long id, @RequestBody PositionRequest request) {
+    public PositionResponse update(@PathVariable Long id, @Valid @RequestBody PositionRequest request) {
         return positionService.update(id, request);
     }
 

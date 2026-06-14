@@ -4,7 +4,7 @@ import com.eript.lms.academic.dto.request.UnitRequest;
 import com.eript.lms.academic.dto.response.UnitResponse;
 import com.eript.lms.academic.entity.organization.Institution;
 import com.eript.lms.academic.entity.organization.Unit;
-import com.eript.lms.academic.exception.ResourceNotFoundException;
+import com.eript.lms.exception.ResourceNotFoundException;
 import com.eript.lms.academic.mapper.UnitMapper;
 import com.eript.lms.academic.repository.organization.InstitutionRepository;
 import com.eript.lms.academic.repository.organization.UnitRepository;

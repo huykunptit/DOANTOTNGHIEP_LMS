@@ -3,6 +3,7 @@ package com.eript.lms.academic.controller.organization;
 import com.eript.lms.academic.dto.request.InstitutionRequest;
 import com.eript.lms.academic.dto.response.InstitutionResponse;
 import com.eript.lms.academic.service.organization.InstitutionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,12 @@ public class InstitutionController {
     private final InstitutionService institutionService;
 
     @PostMapping
-    public ResponseEntity<InstitutionResponse> create(@RequestBody InstitutionRequest request) {
+    public ResponseEntity<InstitutionResponse> create(@Valid @RequestBody InstitutionRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(institutionService.create(request));
     }
 
     @PutMapping("/{id}")
-    public InstitutionResponse update(@PathVariable Long id, @RequestBody InstitutionRequest request) {
+    public InstitutionResponse update(@PathVariable Long id, @Valid @RequestBody InstitutionRequest request) {
         return institutionService.update(id, request);
     }
 
